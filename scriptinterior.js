@@ -6,14 +6,11 @@
     let clock;
     
     // Variables para el movimiento del jugador
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
     let moveForward = false;
     let moveBackward = false;
     let moveLeft = false;
     let moveRight = false;
     
-    // Elemento del overlay
     const overlay = document.getElementById('overlay');
 
     init();
@@ -24,7 +21,7 @@
         scene.background = new THREE.Color(0x333333);
 
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-        camera.position.set(0, -5, 0);
+        camera.position.set(0, 1.6, 0);
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -51,9 +48,16 @@
         dirLight.position.set(10, 10, 5);
         scene.add(dirLight);
 
-        // --- CÓDIGO CLAVE PARA CARGAR EL MODELO ---
+        // --- CÓDIGO CLAVE PARA CARGAR UN SOLO MODELO ---
+        // Asegúrate de que esta variable sea el nombre de tu repositorio
+        const repoName = 'avance-4-iglesia'; 
+        // Cambia este nombre al modelo que quieras cargar en esta página
+        const modelName = 'parteinterior.glb'; 
         const loader = new GLTFLoader();
-        loader.load('./modelos/parteinterior.glb', function (gltf) {
+        // La ruta es absoluta, empezando desde la raíz del repositorio
+        const modelPath = `/${repoName}/modelos/${modelName}`;
+        
+        loader.load(modelPath, function (gltf) {
             const model = gltf.scene;
             scene.add(model);
             
@@ -64,19 +68,17 @@
                 action.play();
             }
 
-            // Para ajustar la cámara al centro del modelo, como lo tenías en tu código original
+            // Ajustar la cámara al modelo cargado
             const box = new THREE.Box3().setFromObject(model);
             const center = new THREE.Vector3();
             box.getCenter(center);
             
-            // Ajustar la posición inicial de la cámara
-            camera.position.set(center.x-50, center.y -70, center.z);
-            camera.rotation.y=-1.6;
+            camera.position.set(center.x, center.y + 1.6, center.z);
             controls.getObject().position.copy(camera.position);
 
-            console.log("¡Modelo 3D cargado con éxito!");
+            console.log(`¡Modelo ${modelName} cargado con éxito!`);
         }, undefined, function (error) {
-            console.error('An error happened:', error);
+            console.error(`Ocurrió un error al cargar el modelo ${modelName}:`, error);
         });
 
         // Oyentes de eventos para el teclado
@@ -112,7 +114,7 @@
         const delta = clock.getDelta();
 
         // Aplicamos el movimiento usando los controles
-        const speed = 10; // Ajusta la velocidad de movimiento
+        const speed = 5; 
         if (moveForward) controls.moveForward(speed * delta);
         if (moveBackward) controls.moveForward(-speed * delta);
         if (moveLeft) controls.moveRight(-speed * delta);
